@@ -92,7 +92,7 @@ DATABASES = {
         "USER": config('USER'),
         "PASSWORD": config('PASSWORD'),
         "HOST": config('HOST'),
-        'PORT': config('PORT', cast=int),
+        "PORT": config('PORT', cast=int),
     }
 }
 
