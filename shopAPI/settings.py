@@ -12,10 +12,11 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 from decouple import config
+from datetime import timedelta
+import os.path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -24,10 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*').split()
-
 
 # Application definition
 
@@ -38,9 +38,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'drf_yasg',
+    'rest_framework_simplejwt',
+    'twilio',
+    'ckeditor',
 
-    #myapp
-
+    # myapps
+    'account',
+    'category',
+    'product',
+    'rating',
+    'order',
 ]
 
 MIDDLEWARE = [
@@ -58,7 +67,7 @@ ROOT_URLCONF = 'shopAPI.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -73,7 +82,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'shopAPI.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
@@ -87,8 +95,6 @@ DATABASES = {
         'PORT': config('PORT', cast=int),
     }
 }
-
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -108,7 +114,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
@@ -120,6 +125,7 @@ USE_I18N = True
 
 USE_TZ = True
 
+AUTH_USER_MODEL = 'account.CustomUser'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
@@ -130,3 +136,36 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication'
+    ]
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'REFRESH_TOKEN_LIFETIME': timedelta(hours=24),
+}
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+
+TWILIO_SID = 'AC2efa009c35d51028a055285db8c6516a'
+TWILIO_AUTH_TOKEN = 'ac27deb4c1c93c79a5609072e91b361f'
+TWILIO_SENDER_PHONE = '+15398002889'
+
+
+CKEDITOR_UPLOAD_PATH = "uploads/"  # Optional: define the upload path for media files
+CKEDITOR_JQUERY_URL = 'https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js'  # Optional: provide the URL to jQuery
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',  # You can customize the toolbar as per your requirements
+        'height': 300,
+        'width': '100%',
+    },
+}
